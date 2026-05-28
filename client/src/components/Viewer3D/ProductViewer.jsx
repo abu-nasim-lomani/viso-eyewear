@@ -1,5 +1,5 @@
-import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Suspense, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import {
   OrbitControls,
   Environment,
@@ -12,73 +12,72 @@ import PlaceholderSunglasses from './PlaceholderSunglasses'
 function Loader() {
   return (
     <Html center>
-      <div className="text-sm text-white/70">Loading 3D…</div>
+      <div className="text-sm text-muted">Loading 3D…</div>
     </Html>
   )
 }
 
+/* Eases the orbit camera to a target azimuth when a gallery angle is picked. */
+function CameraEase({ controlsRef, azimuth }) {
+  useFrame(() => {
+    const c = controlsRef.current
+    if (azimuth == null || !c) return
+    const cur = c.getAzimuthalAngle()
+    c.setAzimuthalAngle(cur + (azimuth - cur) * 0.12)
+    c.update()
+  })
+  return null
+}
+
 /**
- * 360° interactive 3D product viewer (plan §6).
- *
- * Pass `modelUrl` to render a real .glb; omit it to render the
- * procedural placeholder so the experience works before assets land.
+ * 360° interactive 3D product viewer.
+ * `modelUrl` → real .glb; omit → procedural placeholder.
+ * `azimuth` (radians) → ease the camera to a preset angle (null = free + auto-rotate).
  */
 export default function ProductViewer({
   modelUrl,
   frameColor,
   lensColor,
   autoRotate = true,
+  azimuth = null,
+  height = 420,
   className = '',
 }) {
+  const controlsRef = useRef()
   return (
-    <div
-      className={`w-full overflow-hidden rounded-2xl bg-viso-bg ${className}`}
-    >
+    <div className={`w-full overflow-hidden rounded-xl bg-gradient-to-b from-white to-[#e9ebf0] ${className}`}>
       <Canvas
         shadows
         dpr={[1, 1.5]}
         camera={{ position: [0, 0, 3], fov: 45, near: 0.01, far: 100 }}
-        style={{ height: 420 }}
+        style={{ height }}
       >
         <ambientLight intensity={0.5} />
-        <spotLight
-          position={[8, 10, 10]}
-          angle={0.2}
-          penumbra={1}
-          intensity={1.2}
-          castShadow
-        />
+        <spotLight position={[8, 10, 10]} angle={0.2} penumbra={1} intensity={1.2} castShadow />
         <directionalLight position={[-5, 4, 2]} intensity={0.6} />
 
         <Suspense fallback={<Loader />}>
           {modelUrl ? (
             <GlassModel url={modelUrl} />
           ) : (
-            <PlaceholderSunglasses
-              frameColor={frameColor}
-              lensColor={lensColor}
-            />
+            <PlaceholderSunglasses frameColor={frameColor} lensColor={lensColor} />
           )}
           <Environment preset="studio" />
-          <ContactShadows
-            position={[0, -1, 0]}
-            opacity={0.5}
-            scale={5}
-            blur={2.4}
-            far={2}
-          />
+          <ContactShadows position={[0, -1, 0]} opacity={0.5} scale={5} blur={2.4} far={2} />
         </Suspense>
 
         <OrbitControls
+          ref={controlsRef}
           enableZoom
           enablePan={false}
-          autoRotate={autoRotate}
+          autoRotate={azimuth == null && autoRotate}
           autoRotateSpeed={2}
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI / 1.8}
           minDistance={1.6}
           maxDistance={5}
         />
+        <CameraEase controlsRef={controlsRef} azimuth={azimuth} />
       </Canvas>
     </div>
   )

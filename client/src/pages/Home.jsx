@@ -1,275 +1,269 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  ArrowRight, ChevronRight, Zap, ScanFace, Box, Camera, Smile,
+  Truck, RotateCcw, Star, Quote,
+} from 'lucide-react'
 import ProductViewer from '../components/Viewer3D/ProductViewer'
-import ProductGrid from '../components/Product/ProductGrid'
-import Button from '../components/UI/Button'
-import { products } from '../data/products'
+import ProductCard from '../components/Product/ProductCard'
+import FrameThumb from '../components/Product/FrameThumb'
+import { products as LOCAL } from '../data/products'
+import { fetchProducts } from '../services/catalog'
+import { discountPct } from '../utils/format'
 
-const usps = [
-  {
-    title: 'AR Virtual Try-On',
-    desc: 'See frames on your face live',
-    icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.5 12S5.5 5 12 5s9.5 7 9.5 7-3 7-9.5 7-9.5-7-9.5-7z',
-  },
-  {
-    title: 'Cash on Delivery',
-    desc: 'Plus bKash, Nagad & card',
-    icon: 'M3 10h18M7 15h1m4 0h1m-8 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-  },
-  {
-    title: 'UV400 Protection',
-    desc: '100% UVA / UVB blocked',
-    icon: 'M12 3v2m0 14v2m9-9h-2M5 12H3m14.95 6.95l-1.41-1.41M6.46 6.46L5.05 5.05m12.49 0l-1.41 1.41M6.46 17.54l-1.41 1.41M16 12a4 4 0 11-8 0 4 4 0 018 0z',
-  },
-  {
-    title: '7-Day Returns',
-    desc: 'Easy, no-questions returns',
-    icon: 'M4 4v6h6M20 20v-6h-6M20 8a8 8 0 00-14.93-2M4 16a8 8 0 0014.93 2',
-  },
+const benefits = [
+  { icon: Box, label: '360° 3D View', sub: 'Inspect every angle' },
+  { icon: ScanFace, label: 'AR Virtual Try-On', sub: 'See it on your face' },
+  { icon: Truck, label: 'Free Delivery', sub: 'On orders ৳3,000+' },
+  { icon: RotateCcw, label: '7-Day Returns', sub: 'Easy & hassle-free' },
 ]
 
-const styleCards = [
-  { name: 'Aviator', color: '#b08d2e' },
-  { name: 'Wayfarer', color: '#1e3a5f' },
-  { name: 'Round', color: '#3b2a1a' },
-  { name: 'Cat-Eye', color: '#7a2e4e' },
-  { name: 'Shield', color: '#1f5f5a' },
+const tryOnSteps = [
+  { icon: Box, title: 'Pick a frame', desc: 'Browse the collection and open any product.' },
+  { icon: Camera, title: 'Allow your camera', desc: 'We map 468 points on your face in real time.' },
+  { icon: Smile, title: 'See it live', desc: 'The frame sits on your face — move and check the fit.' },
 ]
 
-const testimonials = [
-  {
-    name: 'Tanvir A.',
-    city: 'Dhaka',
-    text: 'AR try-on দেখে অর্ডার করেছি — একদম face-এ ঠিকঠাক বসেছে। দারুণ!',
-  },
-  {
-    name: 'Sumaiya R.',
-    city: 'Chattogram',
-    text: 'Premium quality, fast delivery, bKash payment smooth. Highly recommend.',
-  },
-  {
-    name: 'Rafiul I.',
-    city: 'Sylhet',
-    text: 'The 360° 3D view helped me pick the right frame before buying.',
-  },
+const reviews = [
+  { name: 'Tahsin Ahmed', city: 'Dhaka', rating: 5, text: 'The AR try-on actually helped me pick the right size. Frame quality is solid and delivery was quick.' },
+  { name: 'Nusrat Jahan', city: 'Chattogram', rating: 5, text: 'Loved spinning the glasses in 3D before ordering. Paid with bKash, got it in 3 days.' },
+  { name: 'Rifat Hossain', city: 'Sylhet', rating: 4, text: 'Good value for the price. Cash on delivery made it easy to trust the first order.' },
 ]
-
-function Icon({ d }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-6 w-6"
-    >
-      <path d={d} />
-    </svg>
-  )
-}
 
 export default function Home() {
-  const featured = products.filter((p) => p.isFeatured)
-  const [email, setEmail] = useState('')
-  const [subscribed, setSubscribed] = useState(false)
+  const [items, setItems] = useState(LOCAL) // instant render, then hydrate from API
+  const [endsAt] = useState(() => Date.now() + 5 * 3600e3 + 23 * 60e3 + 11 * 1000)
+
+  useEffect(() => { fetchProducts().then(setItems) }, [])
+
+  const hero = items[0]
+  const styleSample = useMemo(() => {
+    const styles = [...new Set(items.map((p) => p.style))]
+    return styles.map((s) => items.find((p) => p.style === s))
+  }, [items])
+  const flashItems = useMemo(
+    () => [...items].sort((a, b) => discountPct(b.price, b.originalPrice) - discountPct(a.price, a.originalPrice)),
+    [items]
+  )
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 lg:grid-cols-2">
-        <div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-viso-accent">
-            AR Virtual Try-On
-          </p>
-          <h1 className="text-4xl font-bold leading-tight sm:text-6xl">
-            See it on your face
-            <br />
-            before you buy.
-          </h1>
-          <p className="mt-5 max-w-md text-white/60">
-            Premium sunglasses with a real-time 3D viewer and webcam AR
-            try-on. Drag the model to spin it 360°.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/shop">
-              <Button>Shop Collection</Button>
-            </Link>
-            <Button variant="outline" disabled title="Coming in Phase 2">
-              AR Try-On — Phase 2
-            </Button>
+    <div className="shell space-y-4 px-2 py-4 sm:px-4 sm:py-5">
+
+      {/* ══════════ HERO ══════════ */}
+      <section className="hero-glow relative overflow-hidden rounded-2xl bg-ink text-white">
+        <div className="dot-grid pointer-events-none absolute inset-0 opacity-50" />
+        <div className="relative grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-2 lg:p-14">
+          {/* copy */}
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> Live AR Virtual Try-On
+            </span>
+            <h1 className="mt-5 text-[34px] font-extrabold leading-[1.06] sm:text-5xl">
+              Try sunglasses on,<br />
+              in <span className="text-brand">3D</span> &amp; <span className="text-accent">AR.</span>
+            </h1>
+            <p className="mt-4 max-w-md text-sm text-white/65 sm:text-base">
+              Spin any frame in 360°, then see it on your face with your camera — before you buy.
+              Cash on Delivery &amp; bKash, delivered across Bangladesh.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link to="/shop" className="inline-flex items-center gap-2 rounded-lg bg-brand px-7 py-3.5 text-sm font-semibold text-white shadow-[0_10px_24px_-8px_rgba(251,86,7,.6)] transition-colors hover:bg-brand-dark">
+                Shop Collection <ArrowRight size={18} />
+              </Link>
+              <Link to="/shop" className="inline-flex items-center gap-2 rounded-lg bg-white px-7 py-3.5 text-sm font-semibold text-ink transition-transform hover:scale-[1.02]">
+                <ScanFace size={18} /> Try-On in AR
+              </Link>
+            </div>
+            <div className="mt-7 flex flex-wrap gap-2">
+              {['100% UV400', '7-Day Returns', 'Cash on Delivery'].map((t) => (
+                <span key={t} className="rounded-full border border-white/12 px-3 py-1 text-xs text-white/70">{t}</span>
+              ))}
+            </div>
           </div>
-          <div className="mt-8 flex gap-8 text-sm text-white/50">
-            <div>
-              <p className="text-xl font-bold text-white">500+</p>
-              Happy customers
+
+          {/* 3D viewer panel */}
+          <div className="relative">
+            <div className="relative overflow-hidden rounded-2xl bg-white p-2 shadow-pop">
+              <ProductViewer frameColor={hero?.frameColor} lensColor={hero?.lensColor} />
+              <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-ink/85 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-success" /> 3D LIVE
+              </span>
+              <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-bold text-white">
+                <ScanFace size={12} /> AR READY
+              </span>
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl bg-white/85 px-3 py-2 backdrop-blur">
+                <span className="truncate text-xs font-semibold text-ink">{hero?.name?.split(' ').slice(0, 3).join(' ')}</span>
+                <span className="shrink-0 text-[11px] text-muted">Drag to rotate ↻</span>
+              </div>
             </div>
-            <div>
-              <p className="text-xl font-bold text-white">4.7★</p>
-              Average rating
+            <span className="animate-floaty absolute -bottom-3 -left-3 hidden rounded-xl bg-white px-3 py-2 text-xs font-semibold text-ink shadow-pop sm:block">
+              ⭐ 4.7 · 1.2k+ reviews
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ BENEFITS ══════════ */}
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {benefits.map((b) => (
+          <div key={b.label} className="flex items-center gap-3 rounded-xl bg-white p-3.5 shadow-card sm:p-4">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <b.icon size={20} strokeWidth={1.8} />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-semibold text-ink sm:text-sm">{b.label}</p>
+              <p className="truncate text-[11px] text-muted">{b.sub}</p>
             </div>
-            <div>
-              <p className="text-xl font-bold text-white">UV400</p>
-              All lenses
+          </div>
+        ))}
+      </section>
+
+      {/* ══════════ SHOP BY STYLE ══════════ */}
+      <section className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-ink sm:text-xl">Shop by Style</h2>
+          <Link to="/shop" className="flex items-center text-sm font-semibold text-brand hover:text-brand-dark">View all <ChevronRight size={16} /></Link>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-7">
+          {styleSample.map((p) => (
+            <Link
+              key={p.style}
+              to={`/shop?cat=${encodeURIComponent(p.style)}`}
+              className="group flex flex-col items-center gap-2 rounded-xl p-3 transition-colors hover:bg-card-alt"
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-card-alt ring-1 ring-line transition-all group-hover:ring-brand/40 group-hover:shadow-card">
+                <FrameThumb product={p} className="w-11" />
+              </div>
+              <span className="text-center text-xs font-medium text-ink-soft group-hover:text-brand">{p.style}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ AR TRY-ON SHOWCASE ══════════ */}
+      <section className="overflow-hidden rounded-2xl bg-white shadow-card">
+        <div className="grid lg:grid-cols-[1.05fr_1fr]">
+          {/* copy + steps */}
+          <div className="p-6 sm:p-10">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent">Virtual Try-On</span>
+            <h2 className="mt-2 text-2xl font-extrabold text-ink sm:text-3xl">See how they look — before they arrive</h2>
+            <p className="mt-3 max-w-md text-sm text-muted">
+              No more guessing. VISO maps your face in real time so every frame sits exactly where it should.
+              View in 3D, then try it on with your camera.
+            </p>
+            <ol className="mt-6 space-y-4">
+              {tryOnSteps.map((s, i) => (
+                <li key={s.title} className="flex gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-accent">{i + 1}</span>
+                  <div>
+                    <p className="flex items-center gap-1.5 text-sm font-semibold text-ink"><s.icon size={15} className="text-accent" /> {s.title}</p>
+                    <p className="text-[13px] text-muted">{s.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <Link to="/shop" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-accent px-7 py-3.5 text-sm font-semibold text-white shadow-[0_10px_24px_-8px_rgba(67,97,238,.55)] transition-colors hover:bg-accent-dark">
+              <ScanFace size={18} /> Start AR Try-On
+            </Link>
+          </div>
+
+          {/* visual */}
+          <div className="accent-gradient relative flex min-h-[280px] items-center justify-center overflow-hidden p-8">
+            <div className="dot-grid absolute inset-0 opacity-40" />
+            <div className="relative flex h-44 w-44 items-center justify-center rounded-full bg-white/15 backdrop-blur sm:h-56 sm:w-56">
+              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-white shadow-pop sm:h-36 sm:w-36">
+                <FrameThumb product={hero} className="w-24 sm:w-28" />
+              </div>
+              <span className="absolute -right-2 top-4 rounded-lg bg-white px-2.5 py-1 text-[11px] font-bold text-accent shadow-pop">468-pt tracking</span>
+              <span className="animate-floaty absolute -bottom-2 left-2 rounded-lg bg-ink px-2.5 py-1 text-[11px] font-semibold text-white shadow-pop">Real-time fit</span>
             </div>
           </div>
         </div>
-
-        <ProductViewer
-          frameColor={featured[0]?.frameColor}
-          lensColor={featured[0]?.lensColor}
-        />
       </section>
 
-      {/* USP strip */}
-      <section className="border-y border-white/10 bg-viso-surface/50">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 py-8 lg:grid-cols-4">
-          {usps.map((u) => (
-            <div key={u.title} className="flex items-center gap-3">
-              <span className="text-viso-accent">
-                <Icon d={u.icon} />
-              </span>
-              <div>
-                <p className="text-sm font-semibold">{u.title}</p>
-                <p className="text-xs text-white/50">{u.desc}</p>
+      {/* ══════════ FLASH SALE ══════════ */}
+      <section className="overflow-hidden rounded-2xl bg-white shadow-card">
+        <div className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
+          <div className="flex items-center gap-3">
+            <h2 className="flex items-center gap-1.5 text-lg font-extrabold text-brand sm:text-xl">
+              <Zap size={20} fill="currentColor" /> Flash Sale
+            </h2>
+            <Countdown to={endsAt} />
+          </div>
+          <Link to="/shop" className="flex items-center text-sm font-semibold text-brand hover:text-brand-dark">See All <ChevronRight size={16} /></Link>
+        </div>
+        <div className="flex gap-3 overflow-x-auto px-4 pb-5 no-scrollbar sm:px-6">
+          {flashItems.map((p) => (
+            <div key={p._id} className="w-40 shrink-0 sm:w-48">
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════ JUST FOR YOU ══════════ */}
+      <section className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
+        <h2 className="mb-4 text-lg font-bold text-ink sm:text-xl">Just For You</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {items.map((p) => (
+            <ProductCard key={p._id} product={p} />
+          ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link to="/shop" className="inline-flex items-center gap-2 rounded-lg border border-line px-8 py-3 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
+            View All Products <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+
+      {/* ══════════ REVIEWS ══════════ */}
+      <section className="rounded-2xl bg-white p-4 shadow-card sm:p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-ink sm:text-xl">What customers say</h2>
+          <span className="flex items-center gap-1 text-sm text-muted"><Star size={16} className="text-star" fill="currentColor" /> 4.7 average</span>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {reviews.map((r) => (
+            <div key={r.name} className="rounded-xl border border-line p-4">
+              <Quote size={20} className="text-accent/40" />
+              <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">{r.text}</p>
+              <div className="mt-3 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-ink">{r.name}</p>
+                  <p className="text-xs text-muted">{r.city}</p>
+                </div>
+                <span className="flex">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} size={13} className={i < r.rating ? 'text-star' : 'text-line'} fill="currentColor" />
+                  ))}
+                </span>
               </div>
             </div>
           ))}
         </div>
       </section>
+    </div>
+  )
+}
 
-      {/* Shop by Style */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="text-2xl font-bold">Shop by Style</h2>
-        <p className="mt-1 text-sm text-white/50">
-          Find the shape that fits you
-        </p>
-        <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {styleCards.map((s) => (
-            <Link
-              key={s.name}
-              to="/shop"
-              className="group flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-viso-surface p-5 transition hover:border-white/25"
-            >
-              <span
-                className="h-12 w-24 rounded-[40%] border-4 transition group-hover:scale-105"
-                style={{
-                  borderColor: s.color,
-                  background: `${s.color}55`,
-                }}
-              />
-              <span className="text-sm font-semibold">{s.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+function Countdown({ to }) {
+  const [left, setLeft] = useState(() => Math.max(0, to - Date.now()))
+  useEffect(() => {
+    const id = setInterval(() => setLeft(Math.max(0, to - Date.now())), 1000)
+    return () => clearInterval(id)
+  }, [to])
 
-      {/* Featured */}
-      <section className="mx-auto max-w-6xl px-6 pb-16">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl font-bold">Bestsellers</h2>
-          <Link
-            to="/shop"
-            className="text-sm text-white/60 hover:text-white"
-          >
-            View all →
-          </Link>
-        </div>
-        <ProductGrid products={featured} />
-      </section>
+  const pad = (n) => String(n).padStart(2, '0')
+  const h = Math.floor(left / 3.6e6)
+  const m = Math.floor(left / 6e4) % 60
+  const s = Math.floor(left / 1000) % 60
 
-      {/* AR Try-On showcase */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid items-center gap-10 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-viso-surface to-viso-bg p-10 lg:grid-cols-2">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-viso-accent">
-              The VISO difference
-            </p>
-            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
-              Try every frame on,
-              <br />
-              right from your camera.
-            </h2>
-            <p className="mt-4 max-w-md text-white/60">
-              Our AR engine tracks 468 facial points in real time and
-              places the 3D sunglasses precisely on your face — tilt and
-              turn your head, it follows. Snap a photo and share your look.
-            </p>
-            <div className="mt-7">
-              <Button variant="outline" disabled title="Coming in Phase 2">
-                Launch AR Try-On — Phase 2
-              </Button>
-            </div>
-          </div>
-          <ProductViewer
-            frameColor={featured[1]?.frameColor}
-            lensColor={featured[1]?.lensColor}
-          />
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="text-2xl font-bold">What customers say</h2>
-        <div className="mt-7 grid gap-5 sm:grid-cols-3">
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="rounded-2xl border border-white/10 bg-viso-surface p-6"
-            >
-              <p className="text-viso-accent">★★★★★</p>
-              <p className="mt-3 text-sm text-white/70">“{t.text}”</p>
-              <p className="mt-4 text-sm font-semibold">
-                {t.name}{' '}
-                <span className="font-normal text-white/40">
-                  · {t.city}
-                </span>
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="rounded-3xl bg-viso-accent px-8 py-12 text-center text-black">
-          <h2 className="text-2xl font-bold sm:text-3xl">
-            Get ৳200 off your first order
-          </h2>
-          <p className="mt-2 text-sm text-black/70">
-            Subscribe for new drops, offers & styling tips.
-          </p>
-          {subscribed ? (
-            <p className="mt-6 font-semibold">
-              🎉 Subscribed! Check your inbox.
-            </p>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                if (email.trim()) setSubscribed(true)
-              }}
-              className="mx-auto mt-6 flex max-w-md gap-2"
-            >
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@email.com"
-                className="flex-1 rounded-full bg-black/10 px-5 py-3 text-sm text-black placeholder-black/40 outline-none focus:bg-black/15"
-              />
-              <button
-                type="submit"
-                className="rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-black/80"
-              >
-                Subscribe
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
+  return (
+    <div className="flex items-center gap-1">
+      <span className="hidden text-xs text-muted sm:inline">Ends in</span>
+      {[h, m, s].map((n, i) => (
+        <span key={i} className="rounded-md bg-ink px-1.5 py-1 font-mono text-xs font-bold text-white">{pad(n)}</span>
+      ))}
     </div>
   )
 }

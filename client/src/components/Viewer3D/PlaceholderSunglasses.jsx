@@ -28,6 +28,8 @@ function roundedRect(w, h, r) {
 export default function PlaceholderSunglasses({
   frameColor = '#1a1a1a',
   lensColor = '#1e3a5f',
+  lensOpacity = 0.85,
+  lensTransmission = 0.55,
 }) {
   const { frameGeo, lensGeo } = useMemo(() => {
     const lensW = 1.05
@@ -78,11 +80,13 @@ export default function PlaceholderSunglasses({
               color={lensColor}
               metalness={0.1}
               roughness={0.08}
-              transmission={0.55}
+              transmission={lensTransmission}
               thickness={0.4}
               ior={1.45}
+              clearcoat={1}
+              clearcoatRoughness={0.1}
               transparent
-              opacity={0.85}
+              opacity={lensOpacity}
             />
           </mesh>
 
