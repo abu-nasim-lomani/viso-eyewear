@@ -7,7 +7,7 @@ import * as THREE from 'three'
  * several viewers/thumbnails at once), and auto-centers + scales it to a
  * consistent size regardless of the source units/origin. Draco enabled.
  */
-export default function GlassModel({ url, fit = 2.4 }) {
+export default function GlassModel({ url, fit = 1.85 }) {
   const { scene } = useGLTF(url, true)
   const model = useMemo(() => scene.clone(true), [scene]) // safe for multiple instances
   const ref = useRef()
