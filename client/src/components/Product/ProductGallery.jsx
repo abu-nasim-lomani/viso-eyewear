@@ -122,7 +122,7 @@ export default function ProductGallery({ product, onTryAr }) {
             <ZoomImage src={sel.src} alt={product.name} />
           ) : (
             /* No 3D and no images — graceful SVG fallback */
-            <div className="flex h-[300px] w-full items-center justify-center rounded-xl border border-line bg-card-alt sm:h-[400px] lg:h-[460px]">
+            <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-line bg-card-alt lg:aspect-[4/3]">
               <div className="text-center text-muted">
                 <ImageIcon size={36} className="mx-auto opacity-50" />
                 <p className="mt-2 text-xs">No media available</p>
@@ -175,7 +175,7 @@ function ZoomImage({ src, alt }) {
   const [pos, setPos] = useState({ x: 50, y: 50 })
   return (
     <div
-      className="h-[300px] w-full overflow-hidden rounded-xl border border-line bg-white sm:h-[400px] lg:h-[460px]"
+      className="aspect-square w-full overflow-hidden rounded-xl border border-line bg-white lg:aspect-[4/3]"
       onMouseEnter={() => setZoom(true)}
       onMouseLeave={() => setZoom(false)}
       onMouseMove={(e) => {
