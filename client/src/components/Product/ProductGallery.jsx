@@ -52,11 +52,14 @@ export default function ProductGallery({ product, onTryAr }) {
           {/* 3D angle thumbnails — only when a 3D model exists */}
           {has3D && ANGLES.map((a) => {
             const active = sel.kind === '3d' && sel.azimuth === a.azimuth
+            // Hide the extra angles on phones — keeps mobile under the
+            // browser's WebGL-context limit and avoids clutter.
+            const mobileHide = a.id === 'right' || a.id === 'back' ? 'hidden sm:block' : ''
             return (
               <button
                 key={a.id}
                 onClick={() => setSel({ kind: '3d', azimuth: a.azimuth })}
-                className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-card-alt transition-colors ${active ? 'border-brand ring-1 ring-brand' : 'border-line hover:border-ink/30'}`}
+                className={`${mobileHide} relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-card-alt transition-colors ${active ? 'border-brand ring-1 ring-brand' : 'border-line hover:border-ink/30'}`}
               >
                 <AngleThumb product={product} az={a.staticAz} />
                 {a.label && (
@@ -101,7 +104,6 @@ export default function ProductGallery({ product, onTryAr }) {
                 frameColor={product.frameColor}
                 lensColor={product.lensColor}
                 azimuth={sel.azimuth}
-                height={460}
               />
               <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/85 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">
                 <Box size={12} /> 360° 3D View
@@ -120,7 +122,7 @@ export default function ProductGallery({ product, onTryAr }) {
             <ZoomImage src={sel.src} alt={product.name} />
           ) : (
             /* No 3D and no images — graceful SVG fallback */
-            <div className="flex h-[460px] w-full items-center justify-center rounded-xl border border-line bg-card-alt">
+            <div className="flex h-[300px] w-full items-center justify-center rounded-xl border border-line bg-card-alt sm:h-[400px] lg:h-[460px]">
               <div className="text-center text-muted">
                 <ImageIcon size={36} className="mx-auto opacity-50" />
                 <p className="mt-2 text-xs">No media available</p>
@@ -173,7 +175,7 @@ function ZoomImage({ src, alt }) {
   const [pos, setPos] = useState({ x: 50, y: 50 })
   return (
     <div
-      className="h-[460px] w-full overflow-hidden rounded-xl border border-line bg-white"
+      className="h-[300px] w-full overflow-hidden rounded-xl border border-line bg-white sm:h-[400px] lg:h-[460px]"
       onMouseEnter={() => setZoom(true)}
       onMouseLeave={() => setZoom(false)}
       onMouseMove={(e) => {

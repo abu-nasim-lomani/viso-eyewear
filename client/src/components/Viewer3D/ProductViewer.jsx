@@ -40,17 +40,16 @@ export default function ProductViewer({
   lensColor,
   autoRotate = true,
   azimuth = null,
-  height = 420,
   className = '',
 }) {
   const controlsRef = useRef()
   return (
-    <div className={`w-full overflow-hidden rounded-xl bg-gradient-to-b from-white to-[#e9ebf0] ${className}`}>
+    <div className={`relative h-[300px] w-full overflow-hidden rounded-xl bg-gradient-to-b from-white to-[#e9ebf0] sm:h-[400px] lg:h-[460px] ${className}`}>
       <Canvas
         shadows
         dpr={[1, 1.5]}
         camera={{ position: [0, 0, 3], fov: 45, near: 0.01, far: 100 }}
-        style={{ height }}
+        style={{ width: '100%', height: '100%', touchAction: 'none' }}
       >
         <ambientLight intensity={0.5} />
         <spotLight position={[8, 10, 10]} angle={0.2} penumbra={1} intensity={1.2} castShadow />
