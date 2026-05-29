@@ -1,9 +1,13 @@
 /**
  * Mock catalog for Phase 1 — fallback when the API is unavailable.
  * Source of truth is the DB once seeded. Prices in BDT (৳).
- * `frameWidthMm` = real temple-to-temple frame width, used by the AR try-on
- * for true-to-size rendering.
+ * `frameWidthMm` = real temple-to-temple frame width, used by AR true-to-size.
+ * `images` = real product photos (Unsplash, free for commercial use).
+ *   ⚠ These are placeholder stock photos — replace with actual VISO photos
+ *     before commercial launch.
  */
+const u = (id) => `https://images.unsplash.com/photo-${id}?w=900&q=80&auto=format&fit=crop`
+
 export const products = [
   {
     _id: 'phantom-x',
@@ -20,6 +24,12 @@ export const products = [
     lensColor: '#1e3a5f',
     frameWidthMm: 145,
     modelUrl: '/models/phantom-x.glb',
+    images: [
+      u('1473496169904-658ba7c44d8a'),
+      u('1559070081-648fb00b2ed1'),
+      u('1566421966482-ad8076104d8e'),
+      u('1518077824767-b1e9bb27ecb1'),
+    ],
     rating: 4.7,
     numReviews: 1283,
     sold: 3200,
@@ -41,6 +51,12 @@ export const products = [
     frameColor: '#b08d2e',
     lensColor: '#5a3a1e',
     frameWidthMm: 140,
+    images: [
+      u('1567473810954-507d59716c25'),
+      u('1590564310418-66304f55a2c2'),
+      u('1470526446583-d0fe2363d8cb'),
+      u('1570654714498-61a17299c1aa'),
+    ],
     rating: 4.5,
     numReviews: 642,
     sold: 1700,
@@ -62,6 +78,11 @@ export const products = [
     frameColor: '#3b2a1a',
     lensColor: '#2e2e2e',
     frameWidthMm: 142,
+    images: [
+      u('1564040052642-3511d70aa681'),
+      u('1534312464681-8240444efc26'),
+      u('1488310371179-2efa381746d2'),
+    ],
     rating: 4.3,
     numReviews: 418,
     sold: 980,
@@ -83,6 +104,10 @@ export const products = [
     frameColor: '#0d0d0d',
     lensColor: '#1f5f5a',
     frameWidthMm: 150,
+    images: [
+      u('1531380096452-2c5fa9bb9589'),
+      u('1731983061288-a851eb9c9cb7'),
+    ],
     rating: 4.8,
     numReviews: 256,
     sold: 540,
@@ -104,6 +129,10 @@ export const products = [
     frameColor: '#5a1f2e',
     lensColor: '#7a3550',
     frameWidthMm: 138,
+    images: [
+      u('1485340619878-bb139d7bcd15'),
+      u('1766998197662-f277a542cfd0'),
+    ],
     rating: 4.6,
     numReviews: 530,
     sold: 1300,
@@ -125,6 +154,10 @@ export const products = [
     frameColor: '#11212b',
     lensColor: '#143a45',
     frameWidthMm: 148,
+    images: [
+      u('1731983061288-a851eb9c9cb7'),
+      u('1531380096452-2c5fa9bb9589'),
+    ],
     rating: 4.4,
     numReviews: 187,
     sold: 410,
@@ -146,6 +179,10 @@ export const products = [
     frameColor: '#2b2018',
     lensColor: '#23303a',
     frameWidthMm: 144,
+    images: [
+      u('1502929254524-5e4f51903baa'),
+      u('1531265180709-e9b5fb594ca6'),
+    ],
     rating: 4.5,
     numReviews: 364,
     sold: 760,
@@ -167,6 +204,10 @@ export const products = [
     frameColor: '#241a12',
     lensColor: '#3a2a22',
     frameWidthMm: 146,
+    images: [
+      u('1456421385613-d0666bb96b78'),
+      u('1488310371179-2efa381746d2'),
+    ],
     rating: 4.2,
     numReviews: 209,
     sold: 600,

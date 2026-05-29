@@ -21,7 +21,7 @@ const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric',
 const blankProduct = {
   _id: '', name: '', brand: 'VISO', price: '', originalPrice: '', style: 'Wayfarer',
   description: '', frameColor: '#1a1a1a', lensColor: '#1e3a5f', frameWidthMm: 140,
-  stock: 100, tag: '', image: '', modelUrl: '', faceShapes: '', freeShipping: false, isFeatured: false,
+  stock: 100, tag: '', image: '', images: '', modelUrl: '', faceShapes: '', freeShipping: false, isFeatured: false,
 }
 
 export default function Admin() {
@@ -59,7 +59,7 @@ export default function Admin() {
 
   const openNew = () => { setEditing({ ...blankProduct }); setIsNew(true) }
   const openEdit = (p) => {
-    setEditing({ ...blankProduct, ...p, faceShapes: (p.faceShapes || []).join(', ') })
+    setEditing({ ...blankProduct, ...p, faceShapes: (p.faceShapes || []).join(', '), images: (p.images || []).join('\n') })
     setIsNew(false)
   }
 
@@ -69,6 +69,7 @@ export default function Admin() {
       price: Number(form.price), originalPrice: Number(form.originalPrice) || undefined,
       frameWidthMm: Number(form.frameWidthMm) || 140, stock: Number(form.stock) || 0,
       faceShapes: form.faceShapes.split(',').map((s) => s.trim()).filter(Boolean),
+      images: form.images.split('\n').map((s) => s.trim()).filter(Boolean),
       tag: form.tag || null,
     }
     if (isNew) {
@@ -296,6 +297,10 @@ function ProductForm({ form: initial, isNew, onClose, onSave }) {
           <Field label="Face shapes (comma)" value={form.faceShapes} onChange={set('faceShapes')} className="col-span-2" placeholder="Oval, Square, Heart" />
           <Field label="Image URL" value={form.image} onChange={set('image')} className="col-span-2" placeholder="/models/... or https://..." />
           <Field label="3D model URL (.glb)" value={form.modelUrl} onChange={set('modelUrl')} className="col-span-2" placeholder="/models/phantom-x.glb" />
+          <label className="col-span-2">
+            <span className="mb-1 block text-xs font-medium text-muted">Gallery images — one URL per line</span>
+            <textarea value={form.images} onChange={set('images')} rows={3} className="w-full rounded-lg border border-line px-3 py-2 font-mono text-xs text-ink outline-none focus:border-brand" placeholder={'https://images.unsplash.com/photo-...\nhttps://images.unsplash.com/photo-...'} />
+          </label>
           <label className="col-span-2">
             <span className="mb-1 block text-xs font-medium text-muted">Description</span>
             <textarea value={form.description} onChange={set('description')} rows={2} className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand" />

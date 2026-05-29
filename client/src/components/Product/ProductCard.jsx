@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { Star, ShoppingCart, Heart, Box, ScanFace } from 'lucide-react'
 import { useCartStore } from '../../store/cartStore'
-import { bdt, discountPct } from '../../utils/format'
+import { bdt, discountPct, sizedImg } from '../../utils/format'
 import FrameThumb from './FrameThumb'
 
 const compact = (n) =>
@@ -12,6 +12,8 @@ export default function ProductCard({ product }) {
   const navigate = useNavigate()
   const off = discountPct(product.price, product.originalPrice)
   const swatches = [product.frameColor, product.lensColor, '#5b6472']
+  const primary = (product.images && product.images[0]) || product.image
+  const has3D = !!product.modelUrl
 
   return (
     <div
@@ -19,10 +21,19 @@ export default function ProductCard({ product }) {
       className="group card-hover relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl bg-card shadow-card hover:shadow-card-hover"
     >
       {/* image */}
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white to-card-alt p-6">
-        <div className="flex h-full w-full items-center justify-center">
-          <FrameThumb product={product} className="w-[80%] transition-transform duration-500 group-hover:scale-105" />
-        </div>
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white to-card-alt">
+        {primary ? (
+          <img
+            src={sizedImg(primary, 500)}
+            alt={product.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center p-6">
+            <FrameThumb product={product} className="w-[80%] transition-transform duration-500 group-hover:scale-105" />
+          </div>
+        )}
 
         {off > 0 && (
           <span className="absolute left-2.5 top-2.5 rounded-md bg-sale px-1.5 py-0.5 text-[11px] font-bold text-white shadow-sm">
@@ -41,15 +52,17 @@ export default function ProductCard({ product }) {
           <Heart size={16} />
         </button>
 
-        {/* 3D / AR feature badges */}
-        <div className="absolute bottom-2.5 left-2.5 flex gap-1">
-          <span className="flex items-center gap-1 rounded-md bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
-            <Box size={11} /> 3D
-          </span>
-          <span className="flex items-center gap-1 rounded-md bg-ink/90 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-            <ScanFace size={11} /> AR
-          </span>
-        </div>
+        {/* 3D / AR feature badges — only when the product really has a 3D model */}
+        {has3D && (
+          <div className="absolute bottom-2.5 left-2.5 flex gap-1">
+            <span className="flex items-center gap-1 rounded-md bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent shadow-sm">
+              <Box size={11} /> 3D
+            </span>
+            <span className="flex items-center gap-1 rounded-md bg-ink/90 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+              <ScanFace size={11} /> AR
+            </span>
+          </div>
+        )}
       </div>
 
       {/* body */}

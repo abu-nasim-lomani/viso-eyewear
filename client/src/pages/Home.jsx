@@ -9,7 +9,7 @@ import ProductCard from '../components/Product/ProductCard'
 import FrameThumb from '../components/Product/FrameThumb'
 import { products as LOCAL } from '../data/products'
 import { fetchProducts } from '../services/catalog'
-import { discountPct } from '../utils/format'
+import { discountPct, sizedImg } from '../utils/format'
 
 const benefits = [
   { icon: Box, label: '360° 3D View', sub: 'Inspect every angle' },
@@ -131,8 +131,19 @@ export default function Home() {
               to={`/shop?cat=${encodeURIComponent(p.style)}`}
               className="group flex flex-col items-center gap-2 rounded-xl p-3 transition-colors hover:bg-card-alt"
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-card-alt ring-1 ring-line transition-all group-hover:ring-brand/40 group-hover:shadow-card">
-                <FrameThumb product={p} className="w-11" />
+              <div className="h-16 w-16 overflow-hidden rounded-full bg-card-alt ring-1 ring-line transition-all group-hover:ring-brand/40 group-hover:shadow-card">
+                {p.images && p.images[0] ? (
+                  <img
+                    src={sizedImg(p.images[0], 200)}
+                    alt={p.style}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <FrameThumb product={p} className="w-11" />
+                  </div>
+                )}
               </div>
               <span className="text-center text-xs font-medium text-ink-soft group-hover:text-brand">{p.style}</span>
             </Link>

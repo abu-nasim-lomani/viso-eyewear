@@ -6,3 +6,6 @@ export const discountPct = (price, originalPrice) =>
   originalPrice && originalPrice > price
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0
+
+/** Resize an Unsplash CDN URL by rewriting its `w=` query param. */
+export const sizedImg = (url, w) => (url ? url.replace(/w=\d+/, `w=${w}`) : url)
