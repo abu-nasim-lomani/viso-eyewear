@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronRight, Star, Minus, Plus, ShoppingCart, Check, ScanFace,
+  ChevronRight, Star, Minus, Plus, ShoppingCart, Check,
   Truck, RotateCcw, ShieldCheck, MapPin, Heart, Share2,
 } from 'lucide-react'
 import ProductCard from '../components/Product/ProductCard'
@@ -64,7 +64,6 @@ export default function ProductPage() {
   ]
   const color = colorOptions[ci]
   const colored = { ...product, frameColor: color.frame, lensColor: color.lens }
-  const has3D = !!product.modelUrl
 
   const off = discountPct(product.price, product.originalPrice)
   const full = Math.round(product.rating)
@@ -160,11 +159,6 @@ export default function ProductPage() {
 
             {/* CTAs */}
             <div className="mt-5 space-y-2.5">
-              {has3D && (
-                <Button variant="accent" onClick={() => setArOpen(true)} className="w-full" size="lg">
-                  <ScanFace size={18} /> Try in AR
-                </Button>
-              )}
               <div className="grid grid-cols-2 gap-2.5">
                 <Button variant="soft" onClick={() => addToCart()}>
                   {added ? <><Check size={16} /> Added</> : <><ShoppingCart size={16} /> Add to Cart</>}

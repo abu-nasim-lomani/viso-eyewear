@@ -108,12 +108,6 @@ export default function ProductGallery({ product, onTryAr }) {
               <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-ink/85 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">
                 <Box size={12} /> 360° 3D View
               </span>
-              <button
-                onClick={onTryAr}
-                className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white shadow-md transition-colors hover:bg-accent-dark"
-              >
-                <ScanFace size={14} /> Try in AR
-              </button>
               <span className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[11px] text-muted backdrop-blur">
                 <RotateCw size={12} /> Drag to rotate · scroll to zoom
               </span>
@@ -122,7 +116,7 @@ export default function ProductGallery({ product, onTryAr }) {
             <ZoomImage src={sel.src} alt={product.name} />
           ) : (
             /* No 3D and no images — graceful SVG fallback */
-            <div className="mx-auto flex aspect-square w-full max-w-xs items-center justify-center rounded-xl border border-line bg-card-alt sm:max-w-md lg:max-w-none">
+            <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-line bg-card-alt">
               <div className="text-center text-muted">
                 <ImageIcon size={36} className="mx-auto opacity-50" />
                 <p className="mt-2 text-xs">No media available</p>
@@ -136,6 +130,16 @@ export default function ProductGallery({ product, onTryAr }) {
             <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-ink/75 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
               {images.indexOf(sel.src) + 1} / {images.length}
             </span>
+          )}
+
+          {/* Prominent Try in AR CTA — below the canvas (only when 3D model is present) */}
+          {has3D && (
+            <button
+              onClick={onTryAr}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold text-white shadow-[0_8px_18px_-8px_rgba(67,97,238,.55)] transition-colors hover:bg-accent-dark"
+            >
+              <ScanFace size={18} /> Try in AR
+            </button>
           )}
         </div>
       </div>
@@ -175,7 +179,7 @@ function ZoomImage({ src, alt }) {
   const [pos, setPos] = useState({ x: 50, y: 50 })
   return (
     <div
-      className="mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-xl border border-line bg-white sm:max-w-md lg:max-w-none"
+      className="aspect-square w-full overflow-hidden rounded-xl border border-line bg-white"
       onMouseEnter={() => setZoom(true)}
       onMouseLeave={() => setZoom(false)}
       onMouseMove={(e) => {

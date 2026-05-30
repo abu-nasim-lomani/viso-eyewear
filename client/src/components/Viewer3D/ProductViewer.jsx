@@ -44,7 +44,7 @@ export default function ProductViewer({
 }) {
   const controlsRef = useRef()
   return (
-    <div className={`relative mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-gradient-to-b from-white to-[#e9ebf0] sm:max-w-md lg:max-w-none ${className}`}>
+    <div className={`relative aspect-square w-full overflow-hidden rounded-xl bg-gradient-to-b from-white to-[#e9ebf0] ${className}`}>
       <Canvas
         shadows
         dpr={[1, 1.5]}
